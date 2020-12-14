@@ -1,0 +1,134 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{longtable}
+
+
+
+\title{An Assessment of the Effectiveness of Administrative vs. Survey Data for Humanitarian Assistance Targeting}
+\author{Colleen O'Donnell, Carlos Guzman, Alec Russin}
+\date{December 2020}
+
+\begin{document}
+
+\maketitle
+\section{Abstract}
+
+One of the most difficult challenges for governmental bodies and non-profit organizations in the process of giving aid is ensuring the correct population is receiving aid. Aid can be allocated via a number of proxy mechanisms such as geographic or demographic targeting, self or community targeting, or proxy means tests (PMTs). Each of these methods exhibit variation across their implementations, contexts, and performance. PMTs are a common model for poverty targeting. They work by using existing survey data to select a small set of predictors to then survey the eligible population and determine which participants are eligible for the aid. This method typically assigns consumption or expenditure data as a dependent variable to be used as a proxy for poverty and derives a model that weighs factors to predict the poverty level in the eligible population. 
+ 
+In this report, our goal was to develop an econometric expenditure prediction model for refugees in Kenya based on data from the survey “Kenya Socio-economic Profiling Survey of Refugees in Kalobeyei 2018” conducted by the United Nations High Commissioner for Refugees. To do the poverty prediction model, we created a restricted (verifiable variables) and unrestricted dataset (verifiable and unverifiable variables). Ridge, lasso, and elastic net models were run on both datasets and additionally, predicted inclusion and exclusion error rates. Our study found that error rates for both inclusion and exclusion of refugees significantly decreased for the unrestricted dataset in comparison to the restricted. Our findings further support that the survey of all refugees proved beneficial for more accurate aid targeting of the refugee population.
+
+\newpage
+\section{Background}
+Our report is based on the survey “Kenya Socio-economic Profiling Survey of Refugees in Kalobeyei 2018” conducted by the United Nations High Commissioner for Refugees. Kenya has served as a host site for refugees since 1992, but over the past five years, the Kakuma Refugee Camps have greatly increased in population. In conjunction with the World Bank, the survey was conducted in order to address the current issue that the government of Kenya is currently facing. This issue is the lack of inclusion of the refugee population into national household surveys, which measure various indicators such as the monitoring of poverty. The lack of refugee population inclusion in surveys poses a significant problem given that this population carries substantial impact on the local Kenyan population and national surveys are not accurately capturing differences in poverty between refugees and locals. 
+
+The survey addresses the following criteria: Education, Employment, Household Characteristics, Assets, Access to Services, Vulnerability, Social Cohesion, Consumption and Expenditure Food, Nonfood, Education, and Energy. The survey was conducted using two socio-economic questionnaires, which included a basic and an extended questionnaire. The sample used for the extended questionnaire was obtained by using a systematic random sample. All 6,004 households received the basic questionnaire, but only 1,102 (18.5\%) of households received the extended questionnaire. There is a non-response rate of 2\%, most commonly associated with the lack of an adult household member when the survey was conducted.  
+
+\section{Data}
+%% TODO: all data tables in Appendix A
+In the appendix Table \ref{table:1} shows descriptive statistics of individual level demographic information on refugees from the Kalobeyei settlement collected through the socioeconomic profiling interview. The refugee population surveyed is predominantly young, uneducated, evenly split by gender, and largely members of female-led households. A significant number of refugees in our sample can speak (65.54\%), while almost half can read (46.30\%) and write (44.97\%). Additionally, less than half have no education (43.86\%), indicating that about 51.14\% of refugees have some level of education. Of those with an education, 27.86\% have a primary education, while 15.64\% have a secondary education. 
+
+
+In addition to demographic information, we also have information about household assets for the sample refugee population. Table \ref{table:2} in the appendix shows descriptive statistics of all of the assets at a household level. The majority of households own a mosquito net and about half of the households own charcoal. Very few of the refugees own electrically powered items such as a television, a generator, or a refrigerator. Interestingly, 23.49\% of refugees own smartphones, which is significantly more common than other electronically powered items. Less than a quarter of refugees own a table (22.84\%), while very few own a bed (5.41\%). Similarly, 40.01\% of refugees own a toilet. Very few refugees own a mean transportation with bicycles being the most common transportation asset (3.39\%). Furthermore, less than half of the sample owns a toilet and only 19.81\% of refugee households had purchased food in the past seven days. Less than a fourth (19.82\%) of households received food for free, which is the same percentage of households that purchased food in the last seven days. This indicates that those households which purchased food also receive their food for free.
+
+Table \ref{table:3} displays summary statistics of total expenditure per capita and the natural log of total expenditure per capita in Kenyan Shillings (KSH). On average, the refugees in our sample population spent 1,853.32 KSH per capita on a weekly basis. 
+
+\input{table3}
+
+Summary statistics on total spend per capita broken down by category are shown in Table \ref{table:4} suggesting that refugees spent the majority of their money on food followed by education, while they spent significantly less money on non-food assets and energy sources per week. 
+\input{table4.tex}
+
+Figure 1 provides a density histogram visualization of the natural log of total expenditure per capita with the 25th, 40th, and 50th percentile thresholds. 
+
+
+
+
+
+\includegraphics[scale=0.4]{images/figure1.png}
+
+
+
+
+\section{Prediction Model}
+
+Our models are based solely on households chosen for the extended Socio-economic Profiling (SEP) interview. The survey collected information on household characteristics, assets, consumption levels, expenditures, and demographic information about household members. We predict expenditure per capita (in KSH) for all households who received extended SEP interviews between November 2018 and January 2019. Unique identifiers allowed us to merge individual and household level data for further analysis. After cleaning outliers and merging each dataset, we ended with a total of 1,090 households. 
+
+Our approach relies on the ridge regression, the lasso regression, and the elastic net regression. The lasso and elastic net models provide alternative penalty parameters to the ridge model. We fit the models based on our training dataset which is 75\% of the sample (817 households).  We use 10-fold cross validation to select the best alpha parameter and refit the model. We then use the estimated coefficients derived from the training set to predict expenditure using the remaining 25\% of the sample in our validation set (273 households). We were able to assess the discrepancies between the predictions for expenditure by comparing predicted and actual expenditure.
+
+
+We use the following specification for the ridge regression:
+
+
+\input{equation1}
+
+
+where $y_i$ represents ln(expenditure/capita), $\beta_0$ represents the common intercept and $\lambda\sum_{j=1}^p\beta_j^2$ represents the penalty term which penalizes model complexity. 
+
+We use the following specification for the lasso regression:
+
+\input{equation2}
+
+where $y_i$ represents ln(expenditure/capita), $\beta_0$ represents the common intercept and $\lambda\sum_{j=1}^p|\beta_j|$ represents the penalty term which penalizes model complexity. Unlike the ridge regression, the parameter estimates in the lasso regression can be 0 due to the construction of the model. 
+
+We use the following specification for the elastic net regression: 
+
+\input{equation3}
+
+where $y_i$ represents ln(expenditure/capita) and\\ $\lambda\left( \frac{1-\alpha}{2}\sum_{j=1}^m\hat{\beta^2_j}+\alpha\sum_{j=1}^m|\hat{\beta_j}|\right)$ represents the penalty term. The elastic net model is a combination of both the ridge and lasso penalties. As a result, the coefficients on the elastic net model should be in between the ridge and lasso models.
+
+\section{Outcome and Prediction Variables}
+
+As described above, we use demographic information and assets at a household level as independent variables while the natural log of expenditure per capita is the dependent variable. We distinguish between verifiable assets and non-verifiable assets in our analysis to take into account potential inaccuracies in survey reporting. We created a restricted dataset which includes demographic variables and assets. Additionally, we created an unrestricted dataset which includes demographic variables and household assets in addition to non-verifiable household assets such as possession of a bank account. See tables \ref{table:2} and \ref{table:7} for summary statistics on all variables in the restricted and unrestricted datasets. While the information in the restricted dataset is typically available in administrative data, the information in the unrestricted dataset is collected by surveying specific populations.
+
+ 
+
+We ran the ridge, lasso, and elastic net models on both the restricted and unrestricted datasets. See tables \ref{table:MergedRestrict} and \ref{table:MergedUnrestrict} for our results. We replace all missing values with NAs so that all households can receive a predicted expenditure score. Our goal is to determine to what extent humanitarian assistance targeting improves if we use administrative data such as the restricted set compared to surveying the refugee population based on our unrestricted set. 
+
+\section{Prediction Accuracy}
+
+We use two error metrics to assess the accuracy of our models. Exclusion error represents eligible households who fail to receive cash transfers. On the other hand, the inclusion error metric reflects the percentage of refugees who receive transfers given they were ineligible for the program. We report the exclusion and inclusion errors at the 25, 40, and 50th percentiles of the expenditure per capita distribution in Table \ref{table:5} and Table \ref{table:6}. 
+
+\input{ExclusionError}
+
+
+For the restricted models based on the 50th percentile of expenditure per capita, the elastic net model displays the lowest exclusion error rate of 33.82\% compared to the ridge model with a 34.55\% exclusion error and the lasso model with a 36.76\% exclusion error. However, the unrestricted dataset provides substantial improvement in exclusion error rates relative to the restricted datasets. The unrestricted models based on the 50th percentile of expenditure per capita suggest that the ridge and lasso models have the lowest exclusion error of 24.26\% followed by the elastic net model with a 25.00\%  exclusion error. We show that the different penalty terms in the regression equation make little difference to prediction performance. 
+
+\input{InclusionError}
+
+At the 50th percentile for the restricted set, the elastic net model has the smallest inclusion error of 43.40\%, followed by the 44.03\% inclusion error in the ridge model and the 47.24\% inclusion error in the lasso model. On the other hand, the unrestricted models based on the 50th percentile of expenditure per capita display slightly lower error rates. The ridge model has a 30.41\% inclusion error while the lasso and elastic net have inclusion errors of 39.05\% and 40.00\% respectively.
+
+\section{Conclusion}
+
+We conclude that surveying the refugee population reduces inclusion and exclusion error in humanitarian assistance targeting in comparison to relying on administrative data. Our models based on administrative data exhibit higher error rates relative to Altındag et al.’s research. As a result, it may be necessary to explore whether there are other variables that should be included in our administrative dataset to improve prediction accuracy. Another explanation for these results is that the data necessary to target aid is population specific. It may be effective to rely on survey data to target assistance to refugees in the Kalobeyei settlement while administrative data is sufficient to target other populations.
+
+Future research should explore which variables in the survey dataset are heavily weighted and thus contributing to significantly lower error rates in the survey data relative to the administrative data. Our models may also be better at targeting specific subgroups in the refugee population relative to others. As a result, researchers should also consider whether the prediction accuracy improves amongst population subgroups. 
+
+
+
+ \newpage
+ \section{References}
+
+1. Altindag, Onur, et al. “Targeting Humanitarian Aid Using Administrative Data: Model Design and Validation.” SSRN Electronic Journal, 2019, doi:10.2139/ssrn.3444974.
+
+2. “Kenya Socio-economic Profiling Survey of Refugees in Kalobeyei 2018.” United Nations High Commissioner for Refugees, 2020.
+
+3. “Understanding the Socio-economic Conditions of Refugees in Kalobeyei, Kenya.” United Nations High Commissioner for Refugees, 2018.  
+
+\newpage
+\appendix
+
+\renewcommand\thefigure{\thesection.\arabic{table}} 
+
+\section{ppendix}
+\setcounter{table}{0}
+\input{table1}
+\input{table2}
+\input{unrestricted}
+\input{MergedRestrict}
+\input{MergedUnrestrict}
+
+
+\end{document}
